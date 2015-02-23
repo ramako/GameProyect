@@ -1,0 +1,38 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <title>hello phaser!</title>
+        <script src="phaser.min.js"></script>
+        <script src="boot.js"></script>
+        <script src="preload.js"></script>
+        <script src="game.js"></script>
+        <script src="gameTitle.js"></script>
+    </head>
+    <style>
+    canvas {
+   display : block;
+   margin : auto;
+}
+    </style>
+    <body>
+
+    <script type="text/javascript">
+
+    var PlataformasScroller = PlataformasScroller || {};
+        
+    window.onload = function() {
+        
+        PlataformasScroller.game = new Phaser.Game(800, 600, Phaser.AUTO, '');
+        PlataformasScroller.game.state.add('Boot', PlataformasScroller.Boot);
+        PlataformasScroller.game.state.add('Preload', PlataformasScroller.Preload);
+        PlataformasScroller.game.state.add('GameTitle', PlataformasScroller.GameTitle);
+        PlataformasScroller.game.state.add('Game', PlataformasScroller.Game);
+        PlataformasScroller.game.state.start('Preload');
+ 
+    }
+    
+    </script>
+
+    </body>
+</html>
