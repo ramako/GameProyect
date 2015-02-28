@@ -3,6 +3,7 @@ var PlataformasScroller = PlataformasScroller || {};
 PlataformasScroller.GameTitle = function(){};
 var tween;
 var cursor;
+
 PlataformasScroller.GameTitle.prototype = {
     preload: function () {
         
@@ -10,11 +11,14 @@ PlataformasScroller.GameTitle.prototype = {
     create: function () {
     this.cursors = this.game.input.keyboard.createCursorKeys();
     this.add.image(0,0,'titleScreen');
+    titulo=this.add.image(300,200,'title');
     var botonPlay=this.game.add.button(260,320,"play",this.playTheGame,this);
     var botonCreditos = this.game.add.button(260,420,"creditos", this.creditos,this);
-
-    
+    titulo.scale.x=0.0;
+    titulo.scale.y=0.0;
         
+     this.add.tween(titulo.scale).to( { x: 1, y: 1 }, 5000, Phaser.Easing.Bounce.Out, true);
+             
     cursor = this.add.image(230,340,"cursor");
     cursor.canMove=true;
     this.add.tween(cursor)

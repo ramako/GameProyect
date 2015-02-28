@@ -7,6 +7,7 @@ PlataformasScroller.Preload.prototype = {
     this.load.image('play','assets/play.png');
     this.load.image('creditos','assets/creditos.jpg');
     this.load.image('cursor','assets/cursor.png');
+    this.load.image('title', 'assets/title.png');
     },
     
     create: function () {
