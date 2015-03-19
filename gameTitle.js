@@ -43,14 +43,12 @@ PlataformasScroller.GameTitle.prototype = {
     permitirMovimiento: function () {
         this.time.events.add(355, (function () {
          cursor.canMove = true;
-        console.log("permito");
         }),this);
     },
     update: function () {
          if (this.input.keyboard.isDown(Phaser.Keyboard.DOWN) && cursor.canMove){
              cursor.canMove=false;
               this.permitirMovimiento();
-              console.log("Me muevo pabajo!!");
              this.add.tween(cursor).to({ y: 450 }, 200).start();
              console.log(cursor.y);
             
@@ -58,7 +56,6 @@ PlataformasScroller.GameTitle.prototype = {
         else if (this.input.keyboard.isDown(Phaser.Keyboard.UP) && cursor.canMove){
              cursor.canMove=false;
             this.permitirMovimiento();
-             console.log("Me muevo parriba!!");
              this.add.tween(cursor).to({ y: 340 }, 200).start();
              console.log(cursor.y);
             

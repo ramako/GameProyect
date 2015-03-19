@@ -1,5 +1,5 @@
 var PlataformasScroller = PlataformasScroller || {};
-
+var music;
 PlataformasScroller.Game = function(){};
 
 PlataformasScroller.Game.prototype = {
@@ -14,7 +14,7 @@ PlataformasScroller.Game.prototype = {
         this.stage.disableVisibilityChange = true; // No pausa el juego cuando pierde el focus, musica continua sonando.
          this.physics.startSystem(Phaser.Physics.ARCADE);
         this.add.image(0,0,'background');
-       var music= this.add.audio('backgroundMusic');
+       music= this.add.audio('backgroundMusic');
        player = this.add.sprite(52,  150, 'dude');
        this.physics.enable(player, Phaser.Physics.ARCADE);
        this.physics.arcade.checkCollision.down = false
@@ -37,6 +37,8 @@ PlataformasScroller.Game.prototype = {
     dead: function () {
         console.log("YOU HAVE DIED");
         player.kill();
+        music.stop();
+        this.game.state.start("GameOver");
         },
     
     update: function () {
