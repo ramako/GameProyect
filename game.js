@@ -47,29 +47,37 @@ PlataformasScroller.Game.prototype = {
 
         player.events.onOutOfBounds.add(this.dead,this);
         
+        if(player.body.touching.down) {
+            player.jumps=2;
+        }
+            
+        
         if (cursors.left.isDown)
     {
-        //  Move to the left
+        //  Mover hacia la izquierda
         player.body.velocity.x = -150;
 
         player.animations.play('left');
     }
     else if (cursors.right.isDown)
     {
-        //  Move to the right
+        //  Mover hacia la derecha
         player.body.velocity.x = 150;
 
         player.animations.play('right');
     } else
          {
-        //  Stand still
+        //  Pararse
         player.animations.stop();
 
         player.frame = 4;
         
         }
-    if (cursors.up.isDown) {
+        // Doble salto
+    if (cursors.up.isDown  && player.jumps>0) {
+        player.jumps--;
         player.body.velocity.y=-150
+        //this.input.keyboard.downDuration(Phaser.Keyboard.UP,100);
         //code
     }
     else if (cursors.down.isDown) {
