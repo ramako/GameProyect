@@ -49,6 +49,12 @@ PlataformasScroller.Game.prototype = {
         
         if(player.body.touching.down) {
             player.jumps=2;
+            player.jumping=false;
+        }
+        
+        if(this.input.keyboard.upDuration(Phaser.Keyboard.UP) && player.jumping) {
+            player.jumps--;
+            player.jumping=false;   
         }
             
         
@@ -73,11 +79,13 @@ PlataformasScroller.Game.prototype = {
         player.frame = 4;
         
         }
+        
+        
         // Doble salto
-    if (cursors.up.isDown  && player.jumps>0) {
-        player.jumps--;
+    if (cursors.up.isDown  && player.jumps>0 && this.input.keyboard.downDuration(Phaser.Keyboard.UP, 5)) { // controlamos que no este presionada mas de 5 ms porque
+        console.log(player.jumps);                                                                         // si la dejasemos presionada no se decrementan los saltos
+        player.jumping=true;                                                                                // y esta condicion siempre seria true haciendo que el pj vuele.
         player.body.velocity.y=-150
-        //this.input.keyboard.downDuration(Phaser.Keyboard.UP,100);
         //code
     }
     else if (cursors.down.isDown) {
