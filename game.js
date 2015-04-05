@@ -15,7 +15,7 @@ PlataformasScroller.Game.prototype = {
     create: function () {
         this.stage.disableVisibilityChange = true; // No pausa el juego cuando pierde el focus, musica continua sonando.
          this.physics.startSystem(Phaser.Physics.ARCADE);
-        this.add.tileSprite(0,0,1280,640,'background');
+        this.add.tileSprite(0,0,2000,1440,'background');
        music= this.add.audio('backgroundMusic');
        player = this.add.sprite(52,  150, 'dude');
        this.physics.enable(player, Phaser.Physics.ARCADE);
@@ -46,7 +46,7 @@ PlataformasScroller.Game.prototype = {
         mymap.setCollisionByExclusion([0],true, 'Layer1');
 
         this.camera.follow(player);
-        this.world.setBounds(0, 0, 1280, 1280);
+        this.world.setBounds(0, 0, 4000, 1280);
 
     },
     dead: function () {
@@ -59,6 +59,7 @@ PlataformasScroller.Game.prototype = {
     update: function () {
         this.physics.arcade.collide(player,layermain);
         this.physics.arcade.collide(enemy,layermain);
+       // this.physics.arcade.collide(player,enemy,this.dead,null,this); Activar para colisiones contra la cobra
         player.body.velocity.x=0;
         enemy.body.velocity.x=0;
         player.events.onOutOfBounds.add(this.dead,this);
