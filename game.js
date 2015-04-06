@@ -11,6 +11,7 @@ PlataformasScroller.Game.prototype = {
         this.load.tilemap('testmap', 'assets/mapa.json', null, Phaser.Tilemap.TILED_JSON);  // this loads the json tilemap created with tiled (cachekey, filename, type of tilemap parser)
         this.load.image('forest-2', 'assets/forest-2.png');
         this.load.spritesheet('enemy', 'assets/king_cobra.png',96,96);
+        this.load.image('proyectil', 'assets/diamond.png')
       },
     create: function () {
         this.stage.disableVisibilityChange = true; // No pausa el juego cuando pierde el focus, musica continua sonando.
@@ -23,7 +24,7 @@ PlataformasScroller.Game.prototype = {
        player.body.gravity.y=300;
         player.body.collideWorldBounds = true;
 
-        enemy = this.add.sprite(77,160,'enemy');
+        enemy = this.add.sprite(250,160,'enemy');
         this.physics.enable(enemy,Phaser.Physics.ARCADE);
         enemy.body.gravity.y=300;
         enemy.body.collideWorldBounds = true;
@@ -47,6 +48,12 @@ PlataformasScroller.Game.prototype = {
 
         this.camera.follow(player);
         this.world.setBounds(0, 0, 4000, 1280);
+        
+        proyectiles = this.add.group();
+        proyectiles.enableBody=true;
+        proyectiles.physicsBodyType = Phaser.Physics.ARCADE;
+        proyectiles.outOfBoundsKill=true;
+        proyectiles.body.gravity.y=200;
 
     },
     dead: function () {
@@ -64,8 +71,10 @@ PlataformasScroller.Game.prototype = {
         enemy.body.velocity.x=0;
         player.events.onOutOfBounds.add(this.dead,this);
 
-
-
+        var proyectil= proyectiles.create(enemy.body.x,enemy.body.y,'proyectil');
+        this.physics.enable(proyectil, Phaser.Physics.ARCADE);
+        proyectil.body.gravity.y=200;
+        
         if(player.body.onFloor()) {
             player.jumps=2;
             player.jumping=false;
