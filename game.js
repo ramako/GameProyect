@@ -2,6 +2,8 @@ var PlataformasScroller = PlataformasScroller || {};
 var music;
 var enemy = enemy || {};  // namespace para enemigos.
 enemy.snake = function () {}; //clase enemiga snake
+var targetAngle;
+var proyectil;
 
 PlataformasScroller.Game = function(){};
 
@@ -25,7 +27,7 @@ PlataformasScroller.Game.prototype = {
 
     create: function () {
         this.physics.startSystem(Phaser.Physics.ARCADE);
-        this.physics.arcade.gravity.y = 980; // Gravedad del mundo
+        this.physics.arcade.gravity.y = 580; // Gravedad del mundo
         
         this.stage.disableVisibilityChange = true; // No pausa el juego cuando pierde el focus, musica continua sonando.
 
@@ -38,14 +40,14 @@ PlataformasScroller.Game.prototype = {
         player.body.collideWorldBounds = true;
         
 
-        enemy.snake = this.add.sprite(250,160,'snake');
+        enemy.snake = this.add.sprite(450,60,'snake');
         this.physics.enable(enemy.snake,Phaser.Physics.ARCADE);
         //enemy.snake.body.gravity.y=300;
         enemy.snake.body.collideWorldBounds = true;
         enemy.snake.frame=2
         enemy.snake.animations.add('left', [9,10,11]);
         enemy.snake.animations.add('right', [3,4,5]);
-        enemy.snake.fireRate = 1500; // el delay del disparo.
+        enemy.snake.fireRate = 1700; // el delay del disparo.
         enemy.snake.shootTime=0;
         
         music.loop=true;
@@ -79,29 +81,33 @@ PlataformasScroller.Game.prototype = {
         },
     
     shoot: function () {
-        
-        
-    },
-    
 
-    update: function () {
-        this.physics.arcade.collide(player,layermain);
-        this.physics.arcade.collide(enemy.snake,layermain);
-       // this.physics.arcade.collide(player,enemy,this.dead,null,this); Activar para colisiones contra la cobra
-        player.body.velocity.x=0;
-        enemy.snake.body.velocity.x=0;
-        player.events.onOutOfBounds.add(this.dead,this);
-        
-    if(enemy.snake.shootTime + enemy.snake.fireRate < this.time.time) {
-       var proyectil= proyectiles.create(enemy.snake.body.x,enemy.snake.body.y,'proyectil');
+            if(enemy.snake.shootTime + enemy.snake.fireRate < this.time.time) {
+        proyectil= proyectiles.create(enemy.snake.body.x,enemy.snake.body.y,'proyectil');
         this.physics.enable(proyectil, Phaser.Physics.ARCADE);
        // proyectil.body.gravity.y=200;
         console.log(player.x);
         console.log(player.y);
-        proyectil.body.velocity.x=player.x-enemy.snake.x;
-        proyectil.body.velocity.y=-player.y;
+        
+        this.physics.arcade.moveToObject(proyectil, player,300);
+
         enemy.snake.shootTime = this.time.time;
     }
+    },
+    
+
+    update: function () {
+
+        this.physics.arcade.collide(player,proyectil,this.dead,null,this);
+        this.physics.arcade.collide(layermain,proyectil);
+        this.physics.arcade.collide(player,layermain);
+        this.physics.arcade.collide(enemy.snake,layermain);
+       // this.physics.arcade.collide(player,proyectil,this.dead,null,this); Activar para colisiones contra la cobra
+        player.body.velocity.x=0;
+        enemy.snake.body.velocity.x=0;
+        player.events.onOutOfBounds.add(this.dead,this);
+       
+        this.shoot();
         
         if(player.body.onFloor()) {
             player.jumps=2;
@@ -122,8 +128,8 @@ PlataformasScroller.Game.prototype = {
     {
         //  Mover hacia la izquierda
         player.body.velocity.x = -150;
-        enemy.snake.animations.play('left');
-        enemy.snake.body.velocity.x=-100;
+        //enemy.snake.animations.play('left');
+        //enemy.snake.body.velocity.x=-100;
         player.animations.play('left');
     }
     else if (cursors.right.isDown)
@@ -132,8 +138,8 @@ PlataformasScroller.Game.prototype = {
         player.body.velocity.x = 150;
         player.animations.play('right');
 
-        enemy.snake.animations.play('right');
-        enemy.snake.body.velocity.x=100;
+      //  enemy.snake.animations.play('right');
+        //enemy.snake.body.velocity.x=100;
 
     } else
          {
@@ -149,7 +155,7 @@ PlataformasScroller.Game.prototype = {
         // Doble salto
     if (cursors.up.isDown  && player.jumps>0 && this.input.keyboard.downDuration(Phaser.Keyboard.UP, 1)) { // controlamos que no este presionada mas de 5 ms porque                                                                                                             // si la dejasemos presionada no se decrementan los saltos
         player.jumping=true;                                                                                // y esta condicion siempre seria true haciendo que el pj vuele.
-        player.body.velocity.y=-400
+        player.body.velocity.y=-300
  
 
     }
