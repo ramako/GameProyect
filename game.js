@@ -4,7 +4,7 @@ var enemy = enemy || {};  // namespace para enemigos.
 enemy.snake = function () {}; //clase enemiga snake
 var targetAngle;
 var proyectil;
-
+var reverseEnemyTriggers
 
 
 
@@ -77,11 +77,23 @@ PlataformasScroller.Game.prototype = {
         proyectiles.physicsBodyType = Phaser.Physics.ARCADE;
         proyectiles.outOfBoundsKill=true;
         
-        left=this.add.sprite(451,180,'dude');
-        this.physics.enable(left, Phaser.Physics.ARCADE);
+        
+         reverseEnemyTriggers = this.add.group();
+        reverseEnemyTriggers.enableBody = true;
+        reverseEnemyTriggers.physicsBodyType = Phaser.Physics.ARCADE;
+       // reverseEnemy.setAll('body.allowGravity', false);
+        
+        var leftTrigger = this.add.sprite(427, 180, 'dude', 0, reverseEnemyTriggers);
+        leftTrigger.body.setSize(4, 32, 0, 0);
+        leftTrigger.body.allowGravity=false;
+  
+        
+        var rightTrigger = this.add.sprite(605, 180, null, 0, reverseEnemyTriggers);
+        rightTrigger.body.setSize(4, 32, 0, 0);
+        rightTrigger.body.allowGravity=false;
 
-        left.body.setSize(4, 32, 0, 0);
-        left.body.allowGravity=false;
+
+        
         
     },
     prueba: function () {
@@ -120,11 +132,10 @@ PlataformasScroller.Game.prototype = {
         player.events.onOutOfBounds.add(this.dead,this);
      
         
-        this.physics.arcade.overlap(enemy.snake, left, function() {
+        this.physics.arcade.overlap(enemy.snake, reverseEnemyTriggers, function() {
             enemy.snake.body.velocity.x *=-1;
             
         });
-       
        
         this.shoot();
         
