@@ -5,6 +5,10 @@ enemy.snake = function () {}; //clase enemiga snake
 var targetAngle;
 var proyectil;
 
+
+
+
+
 PlataformasScroller.Game = function(){};
 
 PlataformasScroller.Game.prototype = {
@@ -40,7 +44,7 @@ PlataformasScroller.Game.prototype = {
         player.body.collideWorldBounds = true;
         
 
-        enemy.snake = this.add.sprite(450,60,'snake');
+        enemy.snake = this.add.sprite(479,60,'snake');
         this.physics.enable(enemy.snake,Phaser.Physics.ARCADE);
         //enemy.snake.body.gravity.y=300;
         enemy.snake.body.collideWorldBounds = true;
@@ -49,6 +53,7 @@ PlataformasScroller.Game.prototype = {
         enemy.snake.animations.add('right', [3,4,5]);
         enemy.snake.fireRate = 1700; // el delay del disparo.
         enemy.snake.shootTime=0;
+        enemy.snake.body.velocity.x=-40;
         
         music.loop=true;
         music.play();
@@ -58,10 +63,10 @@ PlataformasScroller.Game.prototype = {
 
         player.checkWorldBounds=true;
 
-       mymap = this.add.tilemap('testmap');
+        mymap = this.add.tilemap('testmap');
         mymap.addTilesetImage('forest-2');
+        mymap.setTileIndexCallback(1,this.prueba,this);
         layermain = mymap.createLayer('Layer1');
-
         mymap.setCollisionByExclusion([0],true, 'Layer1');
 
         this.camera.follow(player);
@@ -71,7 +76,17 @@ PlataformasScroller.Game.prototype = {
         proyectiles.enableBody=true;
         proyectiles.physicsBodyType = Phaser.Physics.ARCADE;
         proyectiles.outOfBoundsKill=true;
+        
+        left=this.add.sprite(451,180,'dude');
+        this.physics.enable(left, Phaser.Physics.ARCADE);
 
+        left.body.setSize(4, 32, 0, 0);
+        left.body.allowGravity=false;
+        
+    },
+    prueba: function () {
+        
+      console.log("Callback de tile");  
     },
     dead: function () {
         console.log("YOU HAVE DIED");
@@ -85,9 +100,6 @@ PlataformasScroller.Game.prototype = {
             if(enemy.snake.shootTime + enemy.snake.fireRate < this.time.time) {
         proyectil= proyectiles.create(enemy.snake.body.x,enemy.snake.body.y,'proyectil');
         this.physics.enable(proyectil, Phaser.Physics.ARCADE);
-       // proyectil.body.gravity.y=200;
-        console.log(player.x);
-        console.log(player.y);
         
         this.physics.arcade.moveToObject(proyectil, player,300);
 
@@ -98,14 +110,21 @@ PlataformasScroller.Game.prototype = {
 
     update: function () {
 
-        this.physics.arcade.collide(player,proyectil,this.dead,null,this);
+        this.physics.arcade.overlap(player,proyectil,this.dead,null,this);
         this.physics.arcade.collide(layermain,proyectil);
         this.physics.arcade.collide(player,layermain);
         this.physics.arcade.collide(enemy.snake,layermain);
        // this.physics.arcade.collide(player,proyectil,this.dead,null,this); Activar para colisiones contra la cobra
         player.body.velocity.x=0;
-        enemy.snake.body.velocity.x=0;
+        
         player.events.onOutOfBounds.add(this.dead,this);
+     
+        
+        this.physics.arcade.overlap(enemy.snake, left, function() {
+            enemy.snake.body.velocity.x *=-1;
+            
+        });
+       
        
         this.shoot();
         
@@ -126,10 +145,8 @@ PlataformasScroller.Game.prototype = {
 
         if (cursors.left.isDown)
     {
-        //  Mover hacia la izquierda
         player.body.velocity.x = -150;
-        //enemy.snake.animations.play('left');
-        //enemy.snake.body.velocity.x=-100;
+
         player.animations.play('left');
     }
     else if (cursors.right.isDown)
@@ -138,8 +155,6 @@ PlataformasScroller.Game.prototype = {
         player.body.velocity.x = 150;
         player.animations.play('right');
 
-      //  enemy.snake.animations.play('right');
-        //enemy.snake.body.velocity.x=100;
 
     } else
          {
