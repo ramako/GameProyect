@@ -4,7 +4,7 @@ var enemy = enemy || {};  // namespace para enemigos.
 enemy.snake = function () {}; //clase enemiga snake
 var targetAngle;
 var proyectil;
-var reverseEnemyTriggers
+var reverseEnemyTriggers;
 
 
 
@@ -24,7 +24,7 @@ PlataformasScroller.Game.prototype = {
       },
    render: function () {
 
-    this.game.debug.bodyInfo(player, 32, 32);
+       this.game.debug.bodyInfo(player, 32, 32);
        this.game.debug.body(player);
 
    },
@@ -36,7 +36,7 @@ PlataformasScroller.Game.prototype = {
         this.stage.disableVisibilityChange = true; // No pausa el juego cuando pierde el focus, musica continua sonando.
 
 
-        this.add.tileSprite(0,0,2000,1440,'background');
+        this.add.tileSprite(0,0,2000,640,'background');
        music= this.add.audio('backgroundMusic');
        player = this.add.sprite(52,  150, 'dude');
        this.physics.enable(player, Phaser.Physics.ARCADE);
@@ -70,7 +70,7 @@ PlataformasScroller.Game.prototype = {
         mymap.setCollisionByExclusion([0],true, 'Layer1');
 
         this.camera.follow(player);
-        this.world.setBounds(0, 0, 4000, 1280);
+        this.world.setBounds(0, 0, 4000, 640);
         
         proyectiles = this.add.group();
         proyectiles.enableBody=true;
@@ -81,17 +81,11 @@ PlataformasScroller.Game.prototype = {
          reverseEnemyTriggers = this.add.group();
         reverseEnemyTriggers.enableBody = true;
         reverseEnemyTriggers.physicsBodyType = Phaser.Physics.ARCADE;
-       // reverseEnemy.setAll('body.allowGravity', false);
-        
         var leftTrigger = this.add.sprite(427, 180, 'dude', 0, reverseEnemyTriggers);
         leftTrigger.body.setSize(4, 32, 0, 0);
-        leftTrigger.body.allowGravity=false;
-  
-        
         var rightTrigger = this.add.sprite(605, 180, null, 0, reverseEnemyTriggers);
         rightTrigger.body.setSize(4, 32, 0, 0);
-        rightTrigger.body.allowGravity=false;
-
+        reverseEnemyTriggers.setAll('body.allowGravity', false);
 
         
         
@@ -122,7 +116,7 @@ PlataformasScroller.Game.prototype = {
 
     update: function () {
 
-        this.physics.arcade.overlap(player,proyectil,this.dead,null,this);
+       // this.physics.arcade.overlap(player,proyectil,this.dead,null,this);
         this.physics.arcade.collide(layermain,proyectil);
         this.physics.arcade.collide(player,layermain);
         this.physics.arcade.collide(enemy.snake,layermain);
@@ -134,9 +128,14 @@ PlataformasScroller.Game.prototype = {
         
         this.physics.arcade.overlap(enemy.snake, reverseEnemyTriggers, function() {
             enemy.snake.body.velocity.x *=-1;
+             if(enemy.snake.body.velocity.x>0)
+                enemy.snake.animations.play('right');
+            else
+                enemy.snake.animations.play('left');
             
         });
-       
+        
+
         this.shoot();
         
         if(player.body.onFloor()) {
@@ -171,9 +170,9 @@ PlataformasScroller.Game.prototype = {
          {
         //  Pararse
         player.animations.stop();
-        enemy.snake.animations.stop();
+
         player.frame = 4;
-        enemy.snake.frame = 2;
+
 
         }
 
