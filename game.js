@@ -7,63 +7,9 @@ var targetAngle;
 var proyectil;
 var reverseEnemyTriggers;
 var misil1;
+var explosion;
+var animation;
 
-
-var Misil = function(game, x, y) {
-    Phaser.Sprite.call(this, game, x, y, 'misil');
-
-    // Centramos el punto de pivoteo
-    this.anchor.setTo(0.5, 0.5);
-
-    // Fisicas del misil
-    game.physics.enable(this, Phaser.Physics.ARCADE);
-
-    //Constantes
-    this.SPEED = 150; 
-    this.TURN_RATE = 5; 
-};
-
-Misil.prototype = Object.create(Phaser.Sprite.prototype);
-Misil.prototype.constructor = Misil;
-
-
-Misil.prototype.actualizar= function () {
-    
-    var targetAngle = this.game.math.angleBetween(
-        this.x, this.y,
-        player.x, player.y
-    );
-    
-    console.log(player.x);
-    if (this.rotation !== targetAngle) {
-        // Diferencia del angulo actual y el angulo bojetivo
-        var delta = targetAngle - this.rotation;
-
-        // 180 - 180 para que sea mas rapido
-        if (delta > Math.PI) delta -= Math.PI * 2;
-        if (delta < -Math.PI) delta += Math.PI * 2;
-
-        if (delta > 0) {
-            // Sentido agujas del reloj
-            this.angle += this.TURN_RATE;
-        } else {
-            // Contrario a las agujas del reloj
-            this.angle -= this.TURN_RATE;
-        }
-
-        // Si estan cerca simplemente el angulo sera el del objetivo
-        if (Math.abs(delta) < this.game.math.degToRad(this.TURN_RATE)) {
-            this.rotation = targetAngle;
-        }
-    }
-
-    // Vector velocidad basado en this.rotation y this.SPEED
-    this.body.velocity.x = Math.cos(this.rotation) * this.SPEED;
-    this.body.velocity.y = Math.sin(this.rotation) * this.SPEED;
-    
-};
-
-//var misil1= new Misil();
 
 PlataformasScroller.Game = function(){};
 
@@ -78,6 +24,8 @@ PlataformasScroller.Game.prototype = {
         this.load.spritesheet('snake', 'assets/king_cobra.png',96,96);
         this.load.image('proyectil', 'assets/diamond.png');
         this.load.image('misil','assets/rocket.png')
+        this.load.image('smoke','assets/smoke.png')
+        this.load.spritesheet('explosion', 'assets/explosion.png',128,128);
       },
    render: function () {
 
@@ -101,15 +49,17 @@ PlataformasScroller.Game.prototype = {
        this.physics.arcade.checkCollision.down = false
         player.body.collideWorldBounds = true;
         
-      // misil.misil1 = this.add.sprite(490,80,'misil');  // creación de misil y ajuste de sus propiedades
-       //this.physics.enable(misil1, Phaser.Physics.ARCADE);
-        //misil1.body.allowGravity=false;
-        //misil1.anchor.setTo(0.5,0.5);
         
             misil1 = this.game.add.existing(
         new Misil(this.game, this.game.width/2, this.game.height/2)
     );
-
+    
+        explosion=this.add.sprite(500,200,'explosion');
+        animation=  explosion.animations.add('boom', [0,1,2,3], 60, false);
+        explosion.visible=false;
+        explosion.anchor.setTo(0.5, 0.5);
+        
+        
         console.log(misil1)
         enemy.snake = this.add.sprite(479,60,'snake');
         this.physics.enable(enemy.snake,Phaser.Physics.ARCADE);
@@ -163,6 +113,25 @@ PlataformasScroller.Game.prototype = {
         this.game.state.start("GameOver");
         },
     
+    misilDead: function () {
+        explosion.x=misil1.x;
+         explosion.y=misil1.y;
+         explosion.visible=true;
+         //explosion.kill();
+         animation=explosion.animations.play('boom',40,false,true);
+        explosion.events.onAnimationComplete.add(function() {
+        explosion.kill();
+        misil1.kill();
+        player.kill();
+        music.stop();
+        this.game.state.start("GameOver");
+            
+        },this)
+        
+
+
+    }, 
+    
     shoot: function () {
 
             if(enemy.snake.shootTime + enemy.snake.fireRate < this.time.time) {
@@ -192,8 +161,8 @@ PlataformasScroller.Game.prototype = {
         player.events.onOutOfBounds.add(this.dead,this);
      
         
-     
-        
+     this.physics.arcade.collide(misil1,player,this.misilDead,null,this);
+
         this.physics.arcade.overlap(enemy.snake, reverseEnemyTriggers, function() {
             enemy.snake.body.velocity.x *=-1;
              if(enemy.snake.body.velocity.x>0)
