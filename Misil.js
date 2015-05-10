@@ -8,11 +8,11 @@ var Misil = function(game, x, y) {
     game.physics.enable(this, Phaser.Physics.ARCADE);
 
     //Constantes
-    this.SPEED = 150; 
+    this.SPEED = 165; 
     this.TURN_RATE = 5; 
-    this.WOBBLE_LIMIT = 15; // degrees
-    this.WOBBLE_SPEED = 250; // milliseconds
-     this.SMOKE_LIFETIME = 3000; // milliseconds
+    this.WOBBLE_LIMIT = 15; //grados
+    this.WOBBLE_SPEED = 250; // ms
+     this.SMOKE_LIFETIME = 3000; // ms
     
      this.wobble = this.WOBBLE_LIMIT;
     this.game.add.tween(this)
@@ -22,16 +22,16 @@ var Misil = function(game, x, y) {
             Number.POSITIVE_INFINITY, true
         );
     
-        this.smokeEmitter = this.game.add.emitter(0, 0, 100);
+        this.smokeEmitter = this.game.add.emitter(-100, 0, 100);
     
     this.smokeEmitter.gravity = 0;
     this.smokeEmitter.setXSpeed(0, 0);
-    this.smokeEmitter.setYSpeed(-80, -50); // make smoke drift upwards
+    this.smokeEmitter.setYSpeed(-80, -50); // hacer que el humo vaya hacia arriba
     
         this.smokeEmitter.setAlpha(1, 0, this.SMOKE_LIFETIME,
         Phaser.Easing.Linear.InOut);
 
-    // Create the actual particles
+    // crear humo
     this.smokeEmitter.makeParticles('smoke');
 
     // Start emitting smoke particles one at a time (explode=false) with a
@@ -48,7 +48,6 @@ Misil.prototype.actualizar= function () {
     
     this.smokeEmitter.x = this.x;
     this.smokeEmitter.y = this.y;
-    
     var targetAngle = this.game.math.angleBetween(
         this.x, this.y,
         player.x, player.y

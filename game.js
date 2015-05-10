@@ -9,6 +9,8 @@ var reverseEnemyTriggers;
 var misil1;
 var explosion;
 var animation;
+var enemyBoss;
+ var explotado=false;
 
 
 PlataformasScroller.Game = function(){};
@@ -34,33 +36,40 @@ PlataformasScroller.Game.prototype = {
 
    },
 
+    
     create: function () {
-
+        
+       
+        
         this.physics.startSystem(Phaser.Physics.ARCADE);
         this.physics.arcade.gravity.y = 580; // Gravedad del mundo
         
 
         this.stage.disableVisibilityChange = true; // No pausa el juego cuando pierde el focus, musica continua sonando.
+        
+        
+        
 
         this.add.tileSprite(0,0,2000,640,'background');
        music= this.add.audio('backgroundMusic');
-       player = this.add.sprite(52,  150, 'dude');
+       player = this.add.sprite(3160,  150, 'dude');
        this.physics.enable(player, Phaser.Physics.ARCADE);
        this.physics.arcade.checkCollision.down = false
         player.body.collideWorldBounds = true;
         
         
             misil1 = this.game.add.existing(
-        new Misil(this.game, this.game.width/2, this.game.height/2)
+        new Misil(this.game, 1400, 700)
     );
-    
+    misil1.body.allowGravity=false;
+        
         explosion=this.add.sprite(500,200,'explosion');
-        animation=  explosion.animations.add('boom', [0,1,2,3], 60, false);
+        animation= explosion.animations.add('boom', [0,1,2,3], 60, false);
         explosion.visible=false;
         explosion.anchor.setTo(0.5, 0.5);
         
         
-        console.log(misil1)
+        console.log(misil1);
         enemy.snake = this.add.sprite(479,60,'snake');
         this.physics.enable(enemy.snake,Phaser.Physics.ARCADE);
         enemy.snake.body.collideWorldBounds = true;
@@ -72,7 +81,7 @@ PlataformasScroller.Game.prototype = {
         enemy.snake.body.velocity.x=-40;
         
         music.loop=true;
-        music.play();
+       // music.play();
         player.animations.add('left', [0, 1, 2, 3], 10, true);
         player.animations.add('right', [5, 6, 7, 8], 10, true);
         cursors = this.input.keyboard.createCursorKeys();
@@ -97,13 +106,19 @@ PlataformasScroller.Game.prototype = {
          reverseEnemyTriggers = this.add.group();
         reverseEnemyTriggers.enableBody = true;
         reverseEnemyTriggers.physicsBodyType = Phaser.Physics.ARCADE;
-        var leftTrigger = this.add.sprite(427, 180, 'dude', 0, reverseEnemyTriggers);
+        var leftTrigger = this.add.sprite(427, 180, null, 0, reverseEnemyTriggers);
         leftTrigger.body.setSize(4, 32, 0, 0);
         var rightTrigger = this.add.sprite(605, 180, null, 0, reverseEnemyTriggers);
         rightTrigger.body.setSize(4, 32, 0, 0);
         reverseEnemyTriggers.setAll('body.allowGravity', false);
-
         
+        
+        enemyBoss=this.add.sprite(3296, 350, 'dude');
+        enemyBoss.tint=0x0000FF0
+        
+        this.physics.enable(enemyBoss,Phaser.Physics.ARCADE);
+        enemyBoss.animations.add('left', [0, 1, 2, 3], 10, true);
+        enemyBoss.animations.add('right', [5, 6, 7, 8], 10, true);
         
     },
     dead: function () {
@@ -114,12 +129,14 @@ PlataformasScroller.Game.prototype = {
         },
     
     misilDead: function () {
+        misil1.visible=false;
         explosion.x=misil1.x;
          explosion.y=misil1.y;
          explosion.visible=true;
          //explosion.kill();
          animation=explosion.animations.play('boom',40,false,true);
         explosion.events.onAnimationComplete.add(function() {
+        player.visible=false;
         explosion.kill();
         misil1.kill();
         player.kill();
@@ -150,13 +167,38 @@ PlataformasScroller.Game.prototype = {
         //console.log(misil.SPEED)
        // Misil.actualizar();
        // this.physics.arcade.overlap(player,proyectil,this.dead,null,this);
+        
+        
         this.physics.arcade.collide(layermain,proyectil);
         this.physics.arcade.collide(player,layermain);
         this.physics.arcade.collide(enemy.snake,layermain);
-       // this.physics.arcade.collide(player,proyectil,this.dead,null,this); Activar para colisiones contra la cobra
+        this.physics.arcade.collide(enemyBoss,layermain);
+       // this.physics.arcade.collide(player,proyectil,this.dead,null,this); Activar para colisiones contra el proyectil de la cobra
         player.body.velocity.x=0;
         
-        misil1.actualizar();
+        if(player.x - misil1.x >0 && explotado==false) {
+            
+            
+            if(misil1.x >3050 ) { //cambiar a 3000 pixeles
+                 explosion.x=misil1.x;
+                 explosion.y=misil1.y;
+                 explosion.visible=true;
+                animation=explosion.animations.play('boom',40,false,true);
+                 explosion.events.onAnimationComplete.add(function() {
+                     misil1.kill(); 
+                     explosion.kill();
+                     explosion.visible=false;
+                     
+                 })
+                 explotado=true;
+                misil1.smokeEmitter.on=false;
+            }
+            console.log(misil1.body.gravity)
+            misil1.actualizar();
+            console.log(misil1.body.velocity.x)
+        }
+        
+        console.log(explotado);
         
         player.events.onOutOfBounds.add(this.dead,this);
      
