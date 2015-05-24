@@ -11,7 +11,8 @@ var explosion;
 var animation;
 var enemyBoss;
  var explotado=false;
-
+var cerrado=true;
+var layercerrar;
 
 PlataformasScroller.Game = function(){};
 
@@ -52,7 +53,7 @@ PlataformasScroller.Game.prototype = {
 
         this.add.tileSprite(0,0,2000,640,'background');
        music= this.add.audio('backgroundMusic');
-       player = this.add.sprite(3160,  150, 'dude');
+       player = this.add.sprite(3660,  150, 'dude');
        this.physics.enable(player, Phaser.Physics.ARCADE);
        this.physics.arcade.checkCollision.down = false
         player.body.collideWorldBounds = true;
@@ -90,12 +91,13 @@ PlataformasScroller.Game.prototype = {
 
         mymap = this.add.tilemap('testmap');
         mymap.addTilesetImage('forest-2');
-        mymap.setTileIndexCallback(1,this.prueba,this);
+        //mymap.setTileIndexCallback(1,this.prueba,this);
         layermain = mymap.createLayer('Layer1');
+        
         mymap.setCollisionByExclusion([0],true, 'Layer1');
 
         this.camera.follow(player);
-        this.world.setBounds(0, 0, 4000, 640);
+        this.world.setBounds(0, 0, 4450, 640);
         
         proyectiles = this.add.group();
         proyectiles.enableBody=true;
@@ -113,10 +115,10 @@ PlataformasScroller.Game.prototype = {
         reverseEnemyTriggers.setAll('body.allowGravity', false);
         
         
-        enemyBoss=this.add.sprite(3296, 350, 'dude');
+        enemyBoss=this.add.sprite(3996, 150, 'dude');
         enemyBoss.tint=0x0000FF0
         
-        this.physics.enable(enemyBoss,Phaser.Physics.ARCADE);
+       // this.physics.enable(enemyBoss,Phaser.Physics.ARCADE);
         enemyBoss.animations.add('left', [0, 1, 2, 3], 10, true);
         enemyBoss.animations.add('right', [5, 6, 7, 8], 10, true);
         
@@ -173,6 +175,7 @@ PlataformasScroller.Game.prototype = {
         this.physics.arcade.collide(player,layermain);
         this.physics.arcade.collide(enemy.snake,layermain);
         this.physics.arcade.collide(enemyBoss,layermain);
+        this.physics.arcade.collide(player,layercerrar);
        // this.physics.arcade.collide(player,proyectil,this.dead,null,this); Activar para colisiones contra el proyectil de la cobra
         player.body.velocity.x=0;
         
@@ -193,14 +196,22 @@ PlataformasScroller.Game.prototype = {
                  explotado=true;
                 misil1.smokeEmitter.on=false;
             }
-            console.log(misil1.body.gravity)
             misil1.actualizar();
-            console.log(misil1.body.velocity.x)
+
         }
         
-        console.log(explotado);
         
         player.events.onOutOfBounds.add(this.dead,this);
+        
+        if(player.x>= 3670 && cerrado) {
+            cerrado=false;
+            this.camera.unfollow();
+            this.camera.setPosition(player.x+200,640);
+            layercerrar = mymap.createLayer('cerrar');
+            mymap.setCollisionByExclusion([0],true, 'cerrar');
+            this.physics.enable(enemyBoss,Phaser.Physics.ARCADE);
+            
+        }
      
         
      this.physics.arcade.collide(misil1,player,this.misilDead,null,this);
@@ -216,6 +227,12 @@ PlataformasScroller.Game.prototype = {
         
 
         this.shoot();
+        
+        if(!cerrado) { //IA enemiga , el enemigo se movera por arriba y lanzara bombas. Jugador ha de tratar de escalar y alcanzarlo
+            
+            enemyBoss.body.velocity.y=100;
+            
+        }
         
         if(player.body.onFloor()) {
             player.jumps=2;
