@@ -13,6 +13,7 @@ var enemyBoss;
  var explotado=false;
 var cerrado=true;
 var layercerrar;
+var shotTime=0;
 
 PlataformasScroller.Game = function(){};
 
@@ -189,7 +190,6 @@ PlataformasScroller.Game.prototype = {
         this.physics.arcade.collide(enemy.snake,layermain);
         this.physics.arcade.collide(enemyBoss,layermain);
         this.physics.arcade.collide(player,bomb);
-        this.physics.arcade.collide(layermain,bomb);
         this.physics.arcade.collide(player,layercerrar);
         this.physics.arcade.collide(player,proyectil,this.dead,null,this);// Activar para colisiones contra el proyectil de la cobra
         player.body.velocity.x=0;
@@ -252,16 +252,32 @@ PlataformasScroller.Game.prototype = {
 
 
             if(bomba){
-                bomba.delay=200;
+                bomba.delay=2500;
+                 
+                if(shotTime +bomba.delay < this.time.time ) {  // timer para que las bombas se lancen cada
+                    bomba.reset(enemyBoss.x+4100,enemyBoss.y+250); 
+                    bomba.frame=1;
+                                   
+                                   
+              
+                     shotTime=this.time.time;
+                    }
+                     var item = bomb.getFirstAlive(); //cogemos la primera bomba del grupo
+                    
+                this.physics.arcade.overlap(item, layermain, function() { //cuando choque contra el suelo hacemos la animacion de explotar
+                    if(item)
+                        item.animations.play('explotar',20,false,true);
+                    item.events.onAnimationComplete.add(function() {
+                        item.kill()
+                     
+                 })
+
+
+                     
+                 })
+
+
                 
-                 bomba.reset(enemyBoss.x+4100,enemyBoss.y+250); 
-                console.log(bomba.shotTime)
-                if(bomba.shotTime +bomba.delay < this.time.time ) { // aqui no entra,hacer que funcione...
-                    console.log("katabum")
-                    bomba.animations.play('explotar');
-                    bomba.shotTime=this.time.time;
-            //bomba=bomb.create(enemyBoss.x,enemyBoss.y,'bomb');
-                }
             
             }
 

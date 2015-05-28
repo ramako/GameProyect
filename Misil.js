@@ -34,8 +34,8 @@ var Misil = function(game, x, y) {
     // crear humo
     this.smokeEmitter.makeParticles('smoke');
 
-    // Start emitting smoke particles one at a time (explode=false) with a
-    // lifespan of this.SMOKE_LIFETIME at 50ms intervals
+    // Emitir particulas
+    // 50 ms de vida
     this.smokeEmitter.start(false, this.SMOKE_LIFETIME, 50);
 
 };
