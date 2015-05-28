@@ -29,6 +29,7 @@ PlataformasScroller.Game.prototype = {
         this.load.image('misil','assets/rocket.png')
         this.load.image('smoke','assets/smoke.png')
         this.load.spritesheet('explosion', 'assets/explosion.png',128,128);
+        this.load.spritesheet('bomb','assets/BombSpriteSheet.png',128,128)
       },
    render: function () {
 
@@ -69,6 +70,19 @@ PlataformasScroller.Game.prototype = {
         explosion.visible=false;
         explosion.anchor.setTo(0.5, 0.5);
         
+        bomb=this.add.group();
+        this.physics.enable(bomb,Phaser.Physics.Arcade);
+        bomb.enableBody=true;
+        bomb.createMultiple(5, 'bomb');
+        bomb.setAll('anchor.x',0.5);
+        bomb.setAll('anchor.y',0.5);
+        bomb.scale.x=0.5;
+        bomb.scale.y=0.5;
+         bomb.setAll('body.width',46);
+        bomb.setAll('body.height',52);
+        bomb.callAll('animations.add', 'animations', 'explotar', [0,1,2,3,4,5,6], 20 , true);
+
+         //bomb.callAll('animations.play', 'animations', 'explotar');
         
         console.log(misil1);
         enemy.snake = this.add.sprite(479,60,'snake');
@@ -165,18 +179,19 @@ PlataformasScroller.Game.prototype = {
     
 
     update: function () {
-        //console.log(Object.getOwnPropertyNames(misil))
-        //console.log(misil.SPEED)
-       // Misil.actualizar();
-       // this.physics.arcade.overlap(player,proyectil,this.dead,null,this);
+
+
+        this.physics.arcade.overlap(player,proyectil,this.dead,null,this);
         
         
         this.physics.arcade.collide(layermain,proyectil);
         this.physics.arcade.collide(player,layermain);
         this.physics.arcade.collide(enemy.snake,layermain);
         this.physics.arcade.collide(enemyBoss,layermain);
+        this.physics.arcade.collide(player,bomb);
+        this.physics.arcade.collide(layermain,bomb);
         this.physics.arcade.collide(player,layercerrar);
-       // this.physics.arcade.collide(player,proyectil,this.dead,null,this); Activar para colisiones contra el proyectil de la cobra
+        this.physics.arcade.collide(player,proyectil,this.dead,null,this);// Activar para colisiones contra el proyectil de la cobra
         player.body.velocity.x=0;
         
         if(player.x - misil1.x >0 && explotado==false) {
@@ -205,8 +220,8 @@ PlataformasScroller.Game.prototype = {
         
         if(player.x>= 3670 && cerrado) {
             cerrado=false;
-            this.camera.unfollow();
-            this.camera.setPosition(player.x+200,640);
+       //     this.camera.unfollow();
+         //   this.camera.setPosition(player.x+200,640);
             layercerrar = mymap.createLayer('cerrar');
             mymap.setCollisionByExclusion([0],true, 'cerrar');
             this.physics.enable(enemyBoss,Phaser.Physics.ARCADE);
@@ -232,6 +247,25 @@ PlataformasScroller.Game.prototype = {
             
             enemyBoss.body.velocity.y=100;
             
+            var bomba = bomb.getFirstExists(false);
+        
+
+
+            if(bomba){
+                bomba.delay=200;
+                
+                 bomba.reset(enemyBoss.x+4100,enemyBoss.y+250); 
+                console.log(bomba.shotTime)
+                if(bomba.shotTime +bomba.delay < this.time.time ) { // aqui no entra,hacer que funcione...
+                    console.log("katabum")
+                    bomba.animations.play('explotar');
+                    bomba.shotTime=this.time.time;
+            //bomba=bomb.create(enemyBoss.x,enemyBoss.y,'bomb');
+                }
+            
+            }
+
+
         }
         
         if(player.body.onFloor()) {
