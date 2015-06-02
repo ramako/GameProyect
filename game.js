@@ -132,7 +132,6 @@ PlataformasScroller.Game.prototype = {
         
         enemyBoss=this.add.sprite(3996, 150, 'dude');
         enemyBoss.tint=0x0000FF0
-        
        // this.physics.enable(enemyBoss,Phaser.Physics.ARCADE);
         enemyBoss.animations.add('left', [0, 1, 2, 3], 10, true);
         enemyBoss.animations.add('right', [5, 6, 7, 8], 10, true);
@@ -225,7 +224,8 @@ PlataformasScroller.Game.prototype = {
             layercerrar = mymap.createLayer('cerrar');
             mymap.setCollisionByExclusion([0],true, 'cerrar');
             this.physics.enable(enemyBoss,Phaser.Physics.ARCADE);
-            
+            enemyBoss.body.allowGravity=true;
+            enemyBoss.body.gravity.y=200;
         }
      
         
@@ -245,7 +245,15 @@ PlataformasScroller.Game.prototype = {
         
         if(!cerrado) { //IA enemiga , el enemigo se movera por arriba y lanzara bombas. Jugador ha de tratar de escalar y alcanzarlo
             
-            enemyBoss.body.velocity.y=100;
+            if(player.x - enemyBoss.x >0)
+                enemyBoss.body.velocity.x=100;
+                enemyBoss.body.velocity.y=200;
+            if(enemyBoss.body.onFloor() && enemyBoss.body.y>489)
+                enemyBoss.body.velocity.y=-550;
+            
+
+           // console.log(layermain.getTiles(3600,300,500,500));
+
             
             var bomba = bomb.getFirstExists(false);
         
