@@ -226,6 +226,7 @@ PlataformasScroller.Game.prototype = {
             this.physics.enable(enemyBoss,Phaser.Physics.ARCADE);
             enemyBoss.body.allowGravity=true;
             enemyBoss.body.gravity.y=200;
+            enemyBoss.body.collideWorldBounds=true;
         }
      
         
@@ -245,11 +246,22 @@ PlataformasScroller.Game.prototype = {
         
         if(!cerrado) { //IA enemiga , el enemigo se movera por arriba y lanzara bombas. Jugador ha de tratar de escalar y alcanzarlo
             
+            /*
             if(player.x - enemyBoss.x >0)
                 enemyBoss.body.velocity.x=100;
                 enemyBoss.body.velocity.y=200;
             if(enemyBoss.body.onFloor() && enemyBoss.body.y>489)
                 enemyBoss.body.velocity.y=-550;
+            if()         */
+            if (Math.abs(player.x - enemyBoss.x) < 90 && Math.abs(player.y - enemyBoss.y) <90) {
+                
+                console.log("Cerca!");
+                for(i=0; i<100; i++)
+                    console.log(mymap[i]);
+                
+            }
+           
+
             
 
            // console.log(layermain.getTiles(3600,300,500,500));
