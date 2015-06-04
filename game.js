@@ -14,6 +14,9 @@ var enemyBoss;
 var cerrado=true;
 var layercerrar;
 var shotTime=0;
+var fantasma;
+var line;
+var tileHits = [];
 
 PlataformasScroller.Game = function(){};
 
@@ -31,18 +34,20 @@ PlataformasScroller.Game.prototype = {
         this.load.image('smoke','assets/smoke.png')
         this.load.spritesheet('explosion', 'assets/explosion.png',128,128);
         this.load.spritesheet('bomb','assets/BombSpriteSheet.png',128,128)
+        this.load.image('fantasma','assets/ghost.png')
       },
    render: function () {
 
        this.game.debug.bodyInfo(player, 32, 32);
        this.game.debug.body(player);
+         this.game.debug.geom(line);
 
    },
 
     
     create: function () {
         
-       
+      line= new Phaser.Line();
         
         this.physics.startSystem(Phaser.Physics.ARCADE);
         this.physics.arcade.gravity.y = 580; // Gravedad del mundo
@@ -55,7 +60,7 @@ PlataformasScroller.Game.prototype = {
 
         this.add.tileSprite(0,0,2000,640,'background');
        music= this.add.audio('backgroundMusic');
-       player = this.add.sprite(3660,  150, 'dude');
+       player = this.add.sprite(160,  150, 'dude');
        this.physics.enable(player, Phaser.Physics.ARCADE);
        this.physics.arcade.checkCollision.down = false
         player.body.collideWorldBounds = true;
@@ -136,6 +141,10 @@ PlataformasScroller.Game.prototype = {
         enemyBoss.animations.add('left', [0, 1, 2, 3], 10, true);
         enemyBoss.animations.add('right', [5, 6, 7, 8], 10, true);
         
+        fantasma=this.add.sprite(300, 150, 'fantasma');
+        this.physics.enable(fantasma,Phaser.Physics.ARCADE);
+        fantasma.body.allowGravity=false;
+        
     },
     dead: function () {
         console.log("YOU HAVE DIED");
@@ -181,7 +190,7 @@ PlataformasScroller.Game.prototype = {
     update: function () {
 
 
-        this.physics.arcade.overlap(player,proyectil,this.dead,null,this);
+       // this.physics.arcade.overlap(player,proyectil,this.dead,null,this);
         
         
         this.physics.arcade.collide(layermain,proyectil);
@@ -190,8 +199,33 @@ PlataformasScroller.Game.prototype = {
         this.physics.arcade.collide(enemyBoss,layermain);
         this.physics.arcade.collide(player,bomb);
         this.physics.arcade.collide(player,layercerrar);
-        this.physics.arcade.collide(player,proyectil,this.dead,null,this);// Activar para colisiones contra el proyectil de la cobra
+      //  this.physics.arcade.collide(player,proyectil,this.dead,null,this);// Activar para colisiones contra el proyectil de la cobra
+
         player.body.velocity.x=0;
+        
+        line.start.set(fantasma.x,fantasma.y);
+        line.end.set(player.x, player.y);
+        tileHits = layermain.getRayCastTiles(line,4,true,false);
+         if (tileHits.length > 0)
+    {
+        fantasma.body.velocity.x=0;
+        fantasma.body.velocity.y=0;
+        //  Just so we can visually see the tiles
+        for (var i = 0; i < tileHits.length; i++)
+        {
+            tileHits[i].debug = true;
+        }
+
+        layermain.dirty = true;
+    } else {
+        console.log("fantasmitaaaa")
+        var rotation = this.game.math.angleBetween(fantasma.x,fantasma.y,player.x, player.y);
+        fantasma.body.velocity.x = Math.cos(rotation) * 59;
+        fantasma.body.velocity.y = Math.sin(rotation) * 59;
+
+        
+    }
+        console.log(layermain);
         
         if(player.x - misil1.x >0 && explotado==false) {
             
