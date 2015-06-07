@@ -17,6 +17,8 @@ var shotTime=0;
 var fantasma;
 var line;
 var tileHits = [];
+var tiempoBoss=0;
+var turno=1000;
 
 PlataformasScroller.Game = function(){};
 
@@ -60,7 +62,7 @@ PlataformasScroller.Game.prototype = {
 
         this.add.tileSprite(0,0,2000,640,'background');
        music= this.add.audio('backgroundMusic');
-       player = this.add.sprite(160,  150, 'dude');
+       player = this.add.sprite(3660,  150, 'dude');
        this.physics.enable(player, Phaser.Physics.ARCADE);
        this.physics.arcade.checkCollision.down = false
         player.body.collideWorldBounds = true;
@@ -203,28 +205,34 @@ PlataformasScroller.Game.prototype = {
 
         player.body.velocity.x=0;
         
-        line.start.set(fantasma.x,fantasma.y);
-        line.end.set(player.x, player.y);
-        tileHits = layermain.getRayCastTiles(line,4,true,false);
-         if (tileHits.length > 0)
+        if(line!=null){
+            line.start.set(fantasma.x,fantasma.y);
+            line.end.set(player.x, player.y);
+            tileHits = layermain.getRayCastTiles(line,4,true,false);
+        }
+        
+         if (tileHits.length > 0 && line!=null)
     {
-        fantasma.body.velocity.x=0;
-        fantasma.body.velocity.y=0;
-        //  Just so we can visually see the tiles
+            fantasma.body.velocity.x=0;
+            fantasma.body.velocity.y=0;
+            // Ver las tiles visualmente
         for (var i = 0; i < tileHits.length; i++)
         {
             tileHits[i].debug = true;
         }
 
-        layermain.dirty = true;
+            layermain.dirty = true;
     } else {
-        console.log("fantasmitaaaa")
-        var rotation = this.game.math.angleBetween(fantasma.x,fantasma.y,player.x, player.y);
-        fantasma.body.velocity.x = Math.cos(rotation) * 59;
-        fantasma.body.velocity.y = Math.sin(rotation) * 59;
-
-        
+            console.log("fantasmitaaaa")
+            var rotation = this.game.math.angleBetween(fantasma.x,fantasma.y,player.x, player.y);
+            fantasma.body.velocity.x = Math.cos(rotation) * 59;
+            fantasma.body.velocity.y = Math.sin(rotation) * 59; 
     }
+        if(player.x - fantasma.x > 400) {
+            fantasma.body.velocity.x=0;
+           fantasma.body.velocity.y=0;
+            line=null;
+        }
         console.log(layermain);
         
         if(player.x - misil1.x >0 && explotado==false) {
@@ -290,11 +298,18 @@ PlataformasScroller.Game.prototype = {
             if (Math.abs(player.x - enemyBoss.x) < 90 && Math.abs(player.y - enemyBoss.y) <90) {
                 
                 console.log("Cerca!");
-                for(i=0; i<100; i++)
-                    console.log(mymap[i]);
+                enemyBoss.body.velocity.y=-20;
+                enemyBoss.body.velocity.x=40;
                 
             }
-           
+            else {
+                //enemy.snake.shootTime + enemy.snake.fireRate < this.time.time
+                if(tiempoBoss + turno < this.time.time ) { // cada x segundos saltara
+                   enemyBoss.body.velocity.y=-300;
+                   enemyBoss.body.velocity.x= Math.floor(Math.random() * (500 - 100 + 1)) + 100;
+                   tiempoBoss=this.time.time;
+                }
+            }
 
             
 
