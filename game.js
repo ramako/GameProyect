@@ -18,7 +18,7 @@ var fantasma;
 var line;
 var tileHits = [];
 var tiempoBoss=0;
-var turno=1000;
+var turno=2000;
 
 PlataformasScroller.Game = function(){};
 
@@ -62,7 +62,7 @@ PlataformasScroller.Game.prototype = {
 
         this.add.tileSprite(0,0,2000,640,'background');
        music= this.add.audio('backgroundMusic');
-       player = this.add.sprite(3660,  150, 'dude');
+       player = this.add.sprite(10,  150, 'dude');
        this.physics.enable(player, Phaser.Physics.ARCADE);
        this.physics.arcade.checkCollision.down = false
         player.body.collideWorldBounds = true;
@@ -113,7 +113,6 @@ PlataformasScroller.Game.prototype = {
 
         mymap = this.add.tilemap('testmap');
         mymap.addTilesetImage('forest-2');
-        //mymap.setTileIndexCallback(1,this.prueba,this);
         layermain = mymap.createLayer('Layer1');
         
         mymap.setCollisionByExclusion([0],true, 'Layer1');
@@ -137,7 +136,7 @@ PlataformasScroller.Game.prototype = {
         reverseEnemyTriggers.setAll('body.allowGravity', false);
         
         
-        enemyBoss=this.add.sprite(3996, 150, 'dude');
+        enemyBoss=this.add.sprite(3957, 10, 'dude');
         enemyBoss.tint=0x0000FF0
        // this.physics.enable(enemyBoss,Phaser.Physics.ARCADE);
         enemyBoss.animations.add('left', [0, 1, 2, 3], 10, true);
@@ -160,7 +159,6 @@ PlataformasScroller.Game.prototype = {
         explosion.x=misil1.x;
          explosion.y=misil1.y;
          explosion.visible=true;
-         //explosion.kill();
          animation=explosion.animations.play('boom',40,false,true);
         explosion.events.onAnimationComplete.add(function() {
         player.visible=false;
@@ -189,11 +187,7 @@ PlataformasScroller.Game.prototype = {
     },
     
 
-    update: function () {
-
-
-       // this.physics.arcade.overlap(player,proyectil,this.dead,null,this);
-        
+    update: function () { 
         
         this.physics.arcade.collide(layermain,proyectil);
         this.physics.arcade.collide(player,layermain);
@@ -201,7 +195,8 @@ PlataformasScroller.Game.prototype = {
         this.physics.arcade.collide(enemyBoss,layermain);
         this.physics.arcade.collide(player,bomb);
         this.physics.arcade.collide(player,layercerrar);
-      //  this.physics.arcade.collide(player,proyectil,this.dead,null,this);// Activar para colisiones contra el proyectil de la cobra
+        this.physics.arcade.collide(enemyBoss,layercerrar);
+        this.physics.arcade.collide(player,proyectil,this.dead,null,this);// Activar para colisiones contra el proyectil de la cobra
 
         player.body.velocity.x=0;
         
@@ -228,12 +223,11 @@ PlataformasScroller.Game.prototype = {
             fantasma.body.velocity.x = Math.cos(rotation) * 59;
             fantasma.body.velocity.y = Math.sin(rotation) * 59; 
     }
-        if(player.x - fantasma.x > 400) {
+        if(player.x - fantasma.x > 440) {
             fantasma.body.velocity.x=0;
            fantasma.body.velocity.y=0;
             line=null;
         }
-        console.log(layermain);
         
         if(player.x - misil1.x >0 && explotado==false) {
             
@@ -261,8 +255,8 @@ PlataformasScroller.Game.prototype = {
         
         if(player.x>= 3670 && cerrado) {
             cerrado=false;
-       //     this.camera.unfollow();
-         //   this.camera.setPosition(player.x+200,640);
+            this.camera.unfollow();
+            this.camera.setPosition(player.x+200,640);
             layercerrar = mymap.createLayer('cerrar');
             mymap.setCollisionByExclusion([0],true, 'cerrar');
             this.physics.enable(enemyBoss,Phaser.Physics.ARCADE);
@@ -303,22 +297,17 @@ PlataformasScroller.Game.prototype = {
                 
             }
             else {
-                //enemy.snake.shootTime + enemy.snake.fireRate < this.time.time
                 if(tiempoBoss + turno < this.time.time ) { // cada x segundos saltara
                    enemyBoss.body.velocity.y=-300;
-                   enemyBoss.body.velocity.x= Math.floor(Math.random() * (500 - 100 + 1)) + 100;
+                   enemyBoss.body.velocity.x= 200;
                    tiempoBoss=this.time.time;
+                } else {
+                    enemyBoss.body.velocity.x-=1;
                 }
+
             }
-
-            
-
-           // console.log(layermain.getTiles(3600,300,500,500));
-
-            
+       
             var bomba = bomb.getFirstExists(false);
-        
-
 
             if(bomba){
                 bomba.delay=2500;
@@ -326,9 +315,6 @@ PlataformasScroller.Game.prototype = {
                 if(shotTime +bomba.delay < this.time.time ) {  // timer para que las bombas se lancen cada
                     bomba.reset(enemyBoss.x+4100,enemyBoss.y+250); 
                     bomba.frame=1;
-                                   
-                                   
-              
                      shotTime=this.time.time;
                     }
                      var item = bomb.getFirstAlive(); //cogemos la primera bomba del grupo
@@ -340,17 +326,9 @@ PlataformasScroller.Game.prototype = {
                         item.kill()
                      
                  })
-
-
-                     
                  })
-
-
-                
             
             }
-
-
         }
         
         if(player.body.onFloor()) {
@@ -400,10 +378,6 @@ PlataformasScroller.Game.prototype = {
 
     }
 
-
-
     }
-
-
 
 };
